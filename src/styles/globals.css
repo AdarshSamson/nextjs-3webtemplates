@@ -104,3 +104,123 @@ section.next-prog {
 section.team.section-padding {
   overflow: hidden;
 }
+
+
+
+
+
+
+
+
+
+
+
+/* Overall container styling */
+.app-container {
+    display: flex;
+    height: 100vh;
+    font-family: Arial, sans-serif; /* Use a clean, modern font */
+  }
+  
+  /* Sidebar styling */
+  .sidebar {
+    width: 25%; /* Increase width for better visibility */
+    padding: 20px;
+    background-color: #f0f0f0; /* Light gray background */
+    border-right: 2px solid #ddd; /* Subtle border */
+    overflow-y: auto;
+  }
+  
+  /* Sidebar image styling */
+  .sidebar-image {
+    width: 280px;
+    height: auto;
+    /* max-height: 150px; */
+    margin-bottom: 15px;
+    cursor: pointer;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow */
+    transition: transform 0.3s ease; /* Smooth scale transition */
+  }
+  
+  .sidebar-image:hover {
+    transform: scale(1.05); /* Zoom effect on hover */
+  }
+  
+  /* Canvas container styling */
+  .canvas-container {
+    width: 85%; /* Adjusted width to match sidebar change */
+    padding: 20px;
+    position: relative;
+    background-color: #ffffff; /* White background for clarity */
+  }
+  
+  /* Canvas styling */
+  .canvas {
+    position: relative;
+    width: 100%;
+    height: 100%;
+   
+    border: 1px solid #ddd; /* Subtle border for canvas */
+    background-color: #fafafa; /* Slightly off-white background */
+    overflow: hidden; /* Hide overflow to keep things tidy */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Shadow for depth */
+  }
+  
+  /* Canvas image styling */
+  .rnd {
+    
+    border: 2px solid #ddd;
+    background: #fff;
+    border-radius: 8px; /* Rounded corners for draggable images */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Shadow for depth */
+    transition: box-shadow 0.3s ease; /* Smooth shadow transition */
+  }
+  
+  .rnd:hover {
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2); /* Darker shadow on hover */
+  }
+  
+  .rnd img {
+    
+    border-radius: 8px; /* Match image corners to the container */
+  }
+  
+  /* Button styling for drawing toggle */
+  .rnd button {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+  
+  .rnd button:hover {
+    background: rgba(255, 255, 255, 0.7);
+    transform: scale(1.1); /* Slight scale effect on hover */
+  }
+  
+  .rnd button:active {
+    transform: scale(0.95); /* Pressed effect */
+  }
+  .pencil-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+    z-index: 2;
+    transition: background 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+  }
+  
+  .pencil-button.active {
+    background: #007bff; /* Active background color */
+    color: #fff; /* Active icon color */
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4); /* Shadow to indicate active state */
+  }
+  
