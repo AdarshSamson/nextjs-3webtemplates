@@ -1,1 +1,215 @@
 
+'use client'
+import React, { useState, useRef, useEffect } from 'react';
+import { Rnd } from 'react-rnd'; // Importing react-rnd
+import { FaPen } from 'react-icons/fa'; // Importing a pencil icon from react-icons
+import './custstyles.css'; // Add your own CSS for layout
+
+// Dummy image list
+const imageList = [
+  'https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/21981329-648b-4b85-b531-ef66a1d8a261/AIR+ZOOM+PEGASUS+41+PQ.png',
+  'https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/1f31a5fd-9f59-4331-8bd1-c8fabe073b4e/NIKE+ZOOM+VOMERO+5.png',
+  'https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/2c5fca2b-8444-4de1-8b26-befa5cdca6fb/JORDAN+LUKA+3+PF.png',
+  'https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/ded7c724-13e3-4cd9-8211-182e5e5d11d4/NIKE+REACTX+INFINITY+RUN+4.png',
+];
+
+const CanvasImage = ({ src, index, size, position, onResize, onDrag, isDrawing, toggleDrawing }) => {
+  const canvasRef = useRef(null);
+  const [isDrawingState, setIsDrawingState] = useState(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    const getMousePosition = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    };
+
+    const startDrawing = (e) => {
+      if (!isDrawing) return;
+      drawing = true;
+      const { x, y } = getMousePosition(e);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    };
+
+    const draw = (e) => {
+      if (!drawing || !isDrawing) return;
+      const { x, y } = getMousePosition(e);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    };
+
+    const stopDrawing = () => {
+      if (!isDrawing) return;
+      drawing = false;
+      ctx.beginPath();
+    };
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+
+    return () => {
+      canvas.removeEventListener('mousedown', startDrawing);
+      canvas.removeEventListener('mousemove', draw);
+      canvas.removeEventListener('mouseup', stopDrawing);
+      canvas.removeEventListener('mouseout', stopDrawing);
+    };
+  }, [isDrawing]);
+
+  return (
+    <Rnd
+      size={{ width: size.width, height: size.height }}
+      position={{ x: position.x, y: position.y }}
+      bounds="parent"
+      onDrag={(e, data) => !isDrawing && onDrag(index, data.x, data.y)}
+      onResize={(e, direction, ref, delta, position) => {
+        onResize(index, {
+          width: ref.style.width,
+          height: ref.style.height,
+          ...position,
+        });
+      }}
+      enableResizing={{
+        top: true,
+        right: true,
+        bottom: true,
+        left: true,
+        topRight: true,
+        bottomRight: true,
+        bottomLeft: true,
+        topLeft: true,
+      }} // Enable resizing from all sides and corners
+      style={{
+        border: 'none',
+        background: '#fff',
+        position: 'absolute',
+        zIndex: 1,
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: isDrawing ? 'crosshair' : 'auto',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Add shadow
+        borderRadius: '8px', // Add border radius
+      }}
+    >
+      <img
+        src={src}
+        alt={`canvas-img-${index}`}
+        style={{ width: '100%', height: '100%', display: 'block' }}
+      />
+      <canvas
+        ref={canvasRef}
+        width={size.width}
+        height={size.height}
+        style={{ position: 'absolute', top: 0, left: 0 }}
+      />
+      <button
+        onClick={() => toggleDrawing(index)}
+        className={`pencil-button ${isDrawing ? 'active' : ''}`} // Add active class conditionally
+      >
+        <FaPen />
+      </button>
+    </Rnd>
+  );
+};
+
+function App() {
+  const [canvasImages, setCanvasImages] = useState([]);
+  const [imageSizes, setImageSizes] = useState([]);
+  const [imagePositions, setImagePositions] = useState([]);
+  const [drawingStates, setDrawingStates] = useState({});
+
+  const defaultSize = { width: 250, height: 250 }; // Set your default size here
+  const positionOffset = 20; // Adjust this for spacing between images
+
+  const handleImageClick = (src) => {
+    const newIndex = canvasImages.length;
+  
+    // Calculate new position with left padding
+    const paddingLeft = 30; // Set the desired left padding here
+    const newPosition = {
+      x: (newIndex * (defaultSize.width + positionOffset)) + paddingLeft, // Position images horizontally with padding
+      y: 50, // Keep y position fixed
+    };
+  
+    setCanvasImages([...canvasImages, src]);
+    setImageSizes([...imageSizes, defaultSize]); // Use default size
+    setImagePositions([...imagePositions, newPosition]); // Set new position
+    setDrawingStates({ ...drawingStates, [newIndex]: false }); // Initialize drawing state
+  };
+  
+
+  const handleResize = (index, sizeAndPosition) => {
+    const newSizes = [...imageSizes];
+    newSizes[index] = {
+      width: sizeAndPosition.width,
+      height: sizeAndPosition.height,
+    };
+    setImageSizes(newSizes);
+
+    const newPositions = [...imagePositions];
+    newPositions[index] = { x: sizeAndPosition.x, y: sizeAndPosition.y };
+    setImagePositions(newPositions);
+  };
+
+  const handleDrag = (index, x, y) => {
+    const newPositions = [...imagePositions];
+    newPositions[index] = { x, y };
+    setImagePositions(newPositions);
+  };
+
+  const toggleDrawing = (index) => {
+    setDrawingStates(prev => ({ ...prev, [index]: !prev[index] }));
+  };
+
+  return (
+    <div className="app-container">
+      <div className="sidebar">
+        <h3 className='text-lg tracking-widest  pl-2'>Image List</h3>
+        {imageList.map((imgSrc, idx) => (
+          <img
+            key={idx}
+            src={imgSrc}
+            alt={`img-${idx}`}
+            className="sidebar-image"
+            onClick={() => handleImageClick(imgSrc)}
+          />
+        ))}
+      </div>
+
+      <div className="canvas-container">
+      <h3 className='text-lg tracking-widest font-bold pl-2 text-center'>CANVAS</h3>
+        <div className="canvas px-6">
+          {canvasImages.map((imgSrc, idx) => (
+            <CanvasImage
+              key={idx}
+              src={imgSrc}
+              index={idx}
+              size={imageSizes[idx]}
+              position={imagePositions[idx]}
+              onResize={handleResize}
+              onDrag={handleDrag}
+              isDrawing={drawingStates[idx]}
+              toggleDrawing={toggleDrawing}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+
+export default App;
+
